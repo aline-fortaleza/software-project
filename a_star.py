@@ -21,8 +21,8 @@ class AStarPlanner:
     def get_neighbors(self, node):
         x, y = node
         neighbors = [ #I tested some values and by checking the neighboor by 0.25 it didn't crash. I don't know why
-            (x - 0.25, y), (x + 0.25, y), (x, y - 0.25), (x, y + 0.25),  # right, left, up and down
-            (x - 0.25, y - 0.25), (x + 0.25, y - 0.25), (x - 0.25, y + 0.25), (x + 0.25, y + 0.25)  # diagonal
+            (x - 0.1, y), (x + 0.1, y), (x, y - 0.1), (x, y + 0.1),  # right, left, up and down
+            (x - 0.1, y - 0.1), (x + 0.1, y - 0.1), (x - 0.1, y + 0.1), (x + 0.1, y + 0.1)  # diagonal
         ]
         return [n for n in neighbors if self.is_valid(n)] 
 
@@ -34,8 +34,14 @@ class AStarPlanner:
         came_from = {}  # get the path
         g_score = {start: 0}  # Cost from beggining until now
         f_score = {start: self.heuristic(start, goal)}  # Total estimation
+        
+        max_iterations = 1000
+        iterations = 0
 
         while open_set:
+            if iterations > max_iterations: #if the path is too big it will end the A*
+                break
+           
             _, current = heapq.heappop(open_set)
 
             # check if got into the end point
@@ -54,7 +60,7 @@ class AStarPlanner:
                     # Add to the priority queue
                     heapq.heappush(open_set, (f_score[neighbor], neighbor))
 
-        return []  # If it doesn't find a answer it will return void
+        return self.reconstruct_path(came_from,current)  # If it doesn't find the whole path it will return a partial one
 
     def reconstruct_path(self, came_from, current):
         path = [current]
@@ -76,4 +82,3 @@ def main():
     
     path = planner.plan(start, goal)
     print("Caminho:", path)
-main()
