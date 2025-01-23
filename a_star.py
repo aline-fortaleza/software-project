@@ -14,8 +14,8 @@ class AStarPlanner:
     def is_valid(self, node):
         x, y = node
         # check if the node is inside the field and isn't a obstacle
-        return (0 <= x <= self.field_width and  
-                0 <= y <= self.field_height and 
+        return ( (-self.field_width/2) <= x <= (self.field_width/2) and  
+                (-self.field_height/2) <= y <= (self.field_height/2) and 
                 node not in self.obstacles)
 
     def get_neighbors(self, node):
@@ -65,15 +65,15 @@ class AStarPlanner:
         return path
     
 def main():
-    field_width = 9.0
-    field_height = 6.0
-    obstacles = [(3,3),(4,3), (5,3)]
+    field_width = 6.0
+    field_height = 4.0
+    obstacles = [(-2, 0), (-1.5, 1), (0, -1)]
     
     planner = AStarPlanner(field_width, field_height, obstacles)
     
-    start = (3,4)
-    goal = (8,5)
+    start = (-2.5, -1.5)  # Começa no canto inferior esquerdo
+    goal = (2.5, 1.5)  # Termina no canto superior direito
     
     path = planner.plan(start, goal)
     print("Caminho:", path)
-
+main()
