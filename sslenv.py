@@ -22,6 +22,9 @@ class SSLExampleEnv(SSLBaseEnv):
             time_step=0.025,
             render_mode=render_mode)
         
+        self.field_width = self.field.length
+        self.field_height = self.field.width
+        
         self.DYNAMIC_OBSTACLES, self.max_targets, self.max_rounds = Difficulty.parse(difficulty)
 
         n_obs = 4 # Ball x,y and Robot x, y
@@ -191,3 +194,9 @@ class SSLExampleEnv(SSLBaseEnv):
         x, y = transformer(point.x, point.y)
         size = 0.09 * self.field_renderer.scale
         pygame.draw.circle(screen, color, (x, y), size, 2)
+        
+# def main():
+#     x = SSLExampleEnv() 
+#     print(x.field_height, x.field_width)
+    
+# main()

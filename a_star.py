@@ -9,18 +9,25 @@ class AStarPlanner:
 
     def heuristic(self, node, goal):
         # using the usual distance formula (because we don't have a "real" grid)
-        return math.sqrt((node[0] - goal[0]) ** 2 + (node[1] - goal[1]) ** 2)
+        return 1.1 * math.sqrt((node[0] - goal[0]) ** 2 + (node[1] - goal[1]) ** 2)
 
-    def is_valid(self, node):
+    def is_valid(self, node, goal=None):
         x, y = node
         # check if the node is inside the field and isn't a obstacle
-        return ( (-self.field_width/2) <= x <= (self.field_width/2) and  
-                (-self.field_height/2) <= y <= (self.field_height/2) and 
-                node not in self.obstacles)
+        if not ( (-self.field_width/2) <= x <= (self.field_width/2) and  
+                (-self.field_height/2) <= y <= (self.field_height/2)):
+            return False
+        #check if it's inside the region of the obstacle
+        for ox,oy in self.obstacles:
+            if math.sqrt((x-ox)**2 + (y-oy)**2) <= 0.2:
+                if goal and (x,y) == goal:
+                    return True
+                return False 
+        return True
 
-    def get_neighbors(self, node):
+    def get_neighbors(self, node, goal=None):
         x, y = node
-        neighbors = [ #I tested some values and by checking the neighboor by 0.25 it didn't crash. I don't know why
+        neighbors = [ 
             (x - 0.1, y), (x + 0.1, y), (x, y - 0.1), (x, y + 0.1),  # right, left, up and down
             (x - 0.1, y - 0.1), (x + 0.1, y - 0.1), (x - 0.1, y + 0.1), (x + 0.1, y + 0.1)  # diagonal
         ]
@@ -30,15 +37,16 @@ class AStarPlanner:
         # Priority queue for open nodes
         open_set = []
         heapq.heappush(open_set, (0, start))  # (value of f(n), node)
-
+        print(start, goal)
         came_from = {}  # get the path
         g_score = {start: 0}  # Cost from beggining until now
         f_score = {start: self.heuristic(start, goal)}  # Total estimation
         
-        max_iterations = 1000
+        max_iterations = 5000
         iterations = 0
 
         while open_set:
+            iterations += 1
             if iterations > max_iterations: #if the path is too big it will end the A*
                 break
            
@@ -48,7 +56,7 @@ class AStarPlanner:
             if current == goal:
                 return self.reconstruct_path(came_from, current)
 
-            for neighbor in self.get_neighbors(current):
+            for neighbor in self.get_neighbors(current, goal):
                 tentative_g_score = g_score[current] + self.heuristic(current, neighbor)
 
                 if neighbor not in g_score or tentative_g_score < g_score[neighbor]:
@@ -82,3 +90,5 @@ def main():
     
     path = planner.plan(start, goal)
     print("Caminho:", path)
+    
+#main()

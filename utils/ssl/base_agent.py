@@ -38,7 +38,8 @@ class BaseAgent:
         self.opponents = opponents.copy()
         self.teammates = teammates.copy()
 
-        self.decision()
+        #implementados em agent.py
+        self.decision() 
         self.post_decision()
 
         return Robot( id=self.id, yellow=self.yellow,

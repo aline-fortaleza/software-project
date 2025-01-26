@@ -14,40 +14,39 @@ class ExampleAgent(BaseAgent):
             return
 
         target = self.targets[0] #gets the first target
+        #print(target)
         
-        if not self.path: #just does it when we don't have a path yet
-            planner = AStarPlanner(6.0, 4.0, obstacles= self.get_obstacles()) # width = 6 and height = 4
-            self.path = planner.plan((self.pos.x, self.pos.y), (target.x,  target.y))
-            print(self.path)
-            if not self.path:
-                print("Nenhum caminho encontrado")
-                self.targets.pop(0)
-                return
+        if not self.path: #just does it when we don't have a path yet 
+            if self.pos.dist_to(target) > 0.1: #it didn't get into the target yet
+                planner = AStarPlanner(6.0, 4.0, obstacles= self.get_obstacles()) # width = 6 and height = 4
+                self.path = planner.plan((self.pos.x, self.pos.y), (target.x,  target.y))
+                #print(self.path)
+                if not self.path:
+                    print("Nenhum caminho encontrado")
+                    self.targets.pop(0)
+                    return
+                
+            # else: #when the robot get in the target
+            #     self.targets.pop(0)
+            #     return
             
-        if not self.path: #verify if we still have points in the planned path
-            #when the path doesn't exist, removes the target and return
-            self.targets.pop(0)
-            return    
         
         next_point = Point(*self.path[0]) 
+        #print(next_point)
         
         target_velocity, target_angle_velocity = Navigation.goToPoint(self.robot, next_point)
         self.set_vel(target_velocity)
         self.set_angle_vel(target_angle_velocity)
         #print(f"Target velocity: {target_velocity}, Target angle velocity: {target_angle_velocity}")
 
-        #checks if the robot got into the next point with 0.05 of tolerance
+        #checks if the robot got into the next point with 0.1 of tolerance
         if self.pos.dist_to(next_point) < 0.1:
             self.path.pop(0) #pops out the atual point from the PQ
             
         if not self.path and self.pos.dist_to(target) < 0.1:
             self.targets.pop(0) 
             
-    
-        
-        # target_velocity, target_angle_velocity = Navigation.goToPoint(self.robot, self.targets[0])
-        # self.set_vel(target_velocity)
-        # self.set_angle_vel(target_angle_velocity) 
+     
 
         return
     
